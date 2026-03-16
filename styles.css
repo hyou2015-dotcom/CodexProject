@@ -47,6 +47,23 @@ h2 {
   border: 1px solid #2e3769;
 }
 
+.mobile-controls {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.55rem;
+}
+
+.mobile-controls button {
+  padding: 0.65rem;
+  font-size: 1rem;
+  touch-action: manipulation;
+}
+
+#dropBtn {
+  grid-column: span 2;
+}
+
 .info-panel {
   width: 100%;
   max-width: 300px;
@@ -66,6 +83,21 @@ h2 {
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
+}
+
+.speed-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+#speedLabel {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+#speedRange {
+  width: 100%;
 }
 
 ul {

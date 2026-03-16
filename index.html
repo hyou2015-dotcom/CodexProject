@@ -11,6 +11,14 @@
       <section class="game-panel">
         <h1>テトリス</h1>
         <canvas id="board" width="300" height="600" aria-label="Tetris board"></canvas>
+        <div class="mobile-controls" aria-label="スマホ操作ボタン">
+          <button id="leftBtn" type="button">←</button>
+          <button id="rotateBtn" type="button">⟳</button>
+          <button id="rightBtn" type="button">→</button>
+          <button id="downBtn" type="button">↓</button>
+          <button id="dropBtn" type="button">DROP</button>
+          <button id="pauseBtn" type="button">P</button>
+        </div>
       </section>
       <aside class="info-panel">
         <div class="card">
@@ -21,6 +29,13 @@
           <h2>レベル</h2>
           <p id="level">1</p>
         </div>
+        <div class="card speed-card">
+          <h2>落下速度</h2>
+          <label class="speed-control" for="speedRange">
+            <span id="speedLabel">1.0x</span>
+            <input id="speedRange" type="range" min="0.5" max="2.0" step="0.1" value="1.0" />
+          </label>
+        </div>
         <div class="card">
           <h2>操作方法</h2>
           <ul>
@@ -29,6 +44,7 @@
             <li>↓ : ソフトドロップ</li>
             <li>スペース : ハードドロップ</li>
             <li>P : 一時停止</li>
+            <li>スマホ: 画面下の操作ボタン</li>
           </ul>
         </div>
         <button id="startBtn" type="button">ゲーム開始 / リスタート</button>

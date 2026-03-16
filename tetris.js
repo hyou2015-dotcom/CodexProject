@@ -44,14 +44,23 @@ const boardCanvas = document.getElementById('board');
 const ctx = boardCanvas.getContext('2d');
 const scoreEl = document.getElementById('score');
 const levelEl = document.getElementById('level');
+const speedLabelEl = document.getElementById('speedLabel');
+const speedRangeEl = document.getElementById('speedRange');
 const statusEl = document.getElementById('status');
 const startBtn = document.getElementById('startBtn');
+const leftBtn = document.getElementById('leftBtn');
+const rightBtn = document.getElementById('rightBtn');
+const rotateBtn = document.getElementById('rotateBtn');
+const downBtn = document.getElementById('downBtn');
+const dropBtn = document.getElementById('dropBtn');
+const pauseBtn = document.getElementById('pauseBtn');
 
 let board = [];
 let piece = null;
 let score = 0;
 let level = 1;
 let lines = 0;
+let speedMultiplier = 1;
 let gameOver = true;
 let paused = false;
 let lastTime = 0;
@@ -131,11 +140,12 @@ function spawnPiece() {
 }
 
 function dropInterval() {
-  return Math.max(100, 700 - (level - 1) * 55);
+  const levelInterval = Math.max(100, 700 - (level - 1) * 55);
+  return Math.max(60, levelInterval / speedMultiplier);
 }
 
 function drop() {
-  if (gameOver || paused) return;
+  if (gameOver || paused || !piece) return;
   piece.y += 1;
   if (collision(piece)) {
     piece.y -= 1;
@@ -147,7 +157,7 @@ function drop() {
 }
 
 function hardDrop() {
-  if (gameOver || paused) return;
+  if (gameOver || paused || !piece) return;
   while (!collision(piece)) {
     piece.y += 1;
   }
@@ -159,13 +169,13 @@ function hardDrop() {
 }
 
 function move(dir) {
-  if (gameOver || paused) return;
+  if (gameOver || paused || !piece) return;
   piece.x += dir;
   if (collision(piece)) piece.x -= dir;
 }
 
 function rotatePiece() {
-  if (gameOver || paused) return;
+  if (gameOver || paused || !piece) return;
   const backup = piece.matrix;
   piece.matrix = rotate(piece.matrix);
   if (collision(piece)) {
@@ -178,6 +188,12 @@ function rotatePiece() {
       }
     }
   }
+}
+
+function togglePause() {
+  if (gameOver) return;
+  paused = !paused;
+  statusEl.textContent = paused ? '一時停止中' : `プレイ中（速度 ${speedMultiplier.toFixed(1)}x）`;
 }
 
 function drawCell(x, y, color) {
@@ -218,6 +234,10 @@ function update(time = 0) {
   requestAnimationFrame(update);
 }
 
+function updateSpeedLabel() {
+  speedLabelEl.textContent = `${speedMultiplier.toFixed(1)}x`;
+}
+
 function startGame() {
   resetBoard();
   score = 0;
@@ -228,18 +248,48 @@ function startGame() {
   dropCounter = 0;
   scoreEl.textContent = score;
   levelEl.textContent = level;
-  statusEl.textContent = 'プレイ中';
+  statusEl.textContent = `プレイ中（速度 ${speedMultiplier.toFixed(1)}x）`;
   spawnPiece();
+}
+
+function bindTap(button, action) {
+  let lastTouchAt = 0;
+
+  button.addEventListener('touchstart', (event) => {
+    event.preventDefault();
+    lastTouchAt = performance.now();
+    action();
+  });
+
+  button.addEventListener('click', (event) => {
+    if (performance.now() - lastTouchAt < 500) {
+      event.preventDefault();
+      return;
+    }
+    action();
+  });
 }
 
 startBtn.addEventListener('click', startGame);
 
+speedRangeEl.addEventListener('input', () => {
+  speedMultiplier = Number(speedRangeEl.value);
+  updateSpeedLabel();
+  if (!gameOver && !paused) {
+    statusEl.textContent = `プレイ中（速度 ${speedMultiplier.toFixed(1)}x）`;
+  }
+});
+
+bindTap(leftBtn, () => move(-1));
+bindTap(rightBtn, () => move(1));
+bindTap(rotateBtn, rotatePiece);
+bindTap(downBtn, drop);
+bindTap(dropBtn, hardDrop);
+bindTap(pauseBtn, togglePause);
+
 document.addEventListener('keydown', (event) => {
   if (event.code === 'KeyP') {
-    if (!gameOver) {
-      paused = !paused;
-      statusEl.textContent = paused ? '一時停止中' : 'プレイ中';
-    }
+    togglePause();
     return;
   }
 
@@ -266,4 +316,5 @@ document.addEventListener('keydown', (event) => {
 });
 
 resetBoard();
+updateSpeedLabel();
 update();
